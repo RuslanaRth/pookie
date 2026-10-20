@@ -8,55 +8,344 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
-    body { font-family: 'Fredoka', cursive, sans-serif; background-color: #ffffff; color: #4a3e3d; min-height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-    .screen { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.8s ease-in-out; }
-    .screen.active { opacity: 1; pointer-events: auto; }
-    .s1-container { display: flex; flex-direction: row; align-items: center; justify-content: space-between; max-width: 900px; width: 100%; gap: 40px; }
-    .s1-left { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
-    .s1-title { font-size: 26px; color: #ff7b9c; margin-bottom: 25px; line-height: 1.4; }
-    .pin-indicators { display: flex; gap: 15px; margin-bottom: 30px; }
-    .dot { width: 22px; height: 22px; border-radius: 50%; border: 3px solid #ffb3c6; background-color: transparent; transition: all 0.2s ease; }
-    .dot.filled { background-color: #ff7b9c; border-color: #ff7b9c; box-shadow: 0 0 10px rgba(255, 123, 156, 0.4); }
-    .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 240px; }
-    .btn-key { background: #fff0f3; border: 2px solid #ffccd5; color: #ff7b9c; font-size: 22px; font-weight: 600; padding: 15px 0; border-radius: 18px; cursor: pointer; font-family: inherit; transition: all 0.15s ease; box-shadow: 0 4px 6px rgba(255, 179, 198, 0.2); }
-    .btn-key:active { transform: scale(0.92); background-color: #ffccd5; }
-    .s1-right { flex: 1; display: flex; justify-content: center; }
-    .panda-float { max-width: 320px; width: 100%; height: auto; border-radius: 20px; animation: floating 3.5s ease-in-out infinite; }
-    @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-18px); } }
-    .shake { animation: shake 0.4s ease-in-out; }
-    .error-dots .dot { border-color: #ff4d4d !important; background-color: #ff4d4d !important; }
-    @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
-    .btn-next { margin-top: 30px; padding: 14px 40px; font-size: 20px; font-family: inherit; font-weight: 600; color: white; background: linear-gradient(135deg, #ff7b9c, #ff9ebb); border: none; border-radius: 30px; cursor: pointer; box-shadow: 0 6px 15px rgba(255, 123, 156, 0.4); transition: all 0.2s ease; }
-    .btn-next:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255, 123, 156, 0.5); }
-    .btn-next:active { transform: translateY(1px); }
-    .img-top-right { position: absolute; top: 30px; right: 30px; max-width: 180px; max-height: 180px; border-radius: 15px; object-fit: cover; }
-    .img-bottom-left { position: absolute; bottom: 30px; left: 30px; max-width: 180px; max-height: 180px; border-radius: 15px; object-fit: cover; }
-    .img-top-left { position: absolute; top: 30px; left: 30px; max-width: 180px; max-height: 180px; border-radius: 15px; object-fit: cover; }
-    .img-bottom-right { position: absolute; bottom: 30px; right: 30px; max-width: 180px; max-height: 180px; border-radius: 15px; object-fit: cover; }
-    .center-card { display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 500px; width: 100%; z-index: 2; }
-    .quiz-title { font-size: 28px; color: #ff7b9c; margin-bottom: 25px; }
-    .quiz-options { display: flex; flex-direction: column; gap: 12px; width: 100%; }
-    .btn-option { background: #ffffff; border: 2px solid #ffccd5; color: #5a4b4a; font-size: 18px; font-family: inherit; font-weight: 600; padding: 14px 20px; border-radius: 16px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-    .btn-option:hover { background: #fff0f3; border-color: #ff7b9c; color: #ff7b9c; transform: translateY(-2px); }
-    .s3-content { display: flex; align-items: center; justify-content: center; gap: 40px; max-width: 800px; width: 100%; }
-    .s3-text-box { flex: 1; display: flex; flex-direction: column; align-items: flex-start; }
-    .s3-text { font-size: 30px; color: #ff7b9c; line-height: 1.3; margin-bottom: 20px; }
-    .s3-img { flex: 1; max-width: 320px; border-radius: 20px; object-fit: cover; }
-    .center-text { font-size: 28px; color: #ff7b9c; max-width: 550px; text-align: center; line-height: 1.4; z-index: 2; }
-    .final-img { max-width: 85vw; max-height: 85vh; border-radius: 20px; object-fit: contain; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-    canvas#confetti-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 999; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Fredoka', cursive, sans-serif;
+      background-color: #ffffff;
+      color: #4a3e3d;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease-in-out;
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Screen 1: Pin-pad */
+    .s1-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 900px;
+      width: 100%;
+      gap: 40px;
+    }
+
+    .s1-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .s1-title {
+      font-size: 26px;
+      color: #ff7b9c;
+      margin-bottom: 25px;
+      line-height: 1.4;
+    }
+
+    .pin-indicators {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 3px solid #ffb3c6;
+      background-color: transparent;
+      transition: all 0.2s ease;
+    }
+
+    .dot.filled {
+      background-color: #ff7b9c;
+      border-color: #ff7b9c;
+      box-shadow: 0 0 10px rgba(255, 123, 156, 0.4);
+    }
+
+    .pin-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 240px;
+    }
+
+    .btn-key {
+      background: #fff0f3;
+      border: 2px solid #ffccd5;
+      color: #ff7b9c;
+      font-size: 22px;
+      font-weight: 600;
+      padding: 15px 0;
+      border-radius: 18px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      box-shadow: 0 4px 6px rgba(255, 179, 198, 0.2);
+    }
+
+    .btn-key:active {
+      transform: scale(0.92);
+      background-color: #ffccd5;
+    }
+
+    .s1-right {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .panda-float {
+      max-width: 320px;
+      width: 100%;
+      height: auto;
+      border-radius: 20px;
+      animation: floating 3.5s ease-in-out infinite;
+    }
+
+    @keyframes floating {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-18px); }
+    }
+
+    .shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    .error-dots .dot {
+      border-color: #ff4d4d !important;
+      background-color: #ff4d4d !important;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+
+    /* Common Button Styles */
+    .btn-next {
+      margin-top: 30px;
+      padding: 14px 40px;
+      font-size: 20px;
+      font-family: inherit;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #ff7b9c, #ff9ebb);
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(255, 123, 156, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn-next:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 123, 156, 0.5);
+    }
+
+    .btn-next:active {
+      transform: translateY(1px);
+      /* Absolute Corner Images */
+    .img-top-right {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      max-width: 180px;
+      max-height: 180px;
+      border-radius: 15px;
+      object-fit: cover;
+    }
+
+    .img-bottom-left {
+      position: absolute;
+      bottom: 30px;
+      left: 30px;
+      max-width: 180px;
+      max-height: 180px;
+      border-radius: 15px;
+      object-fit: cover;
+    }
+
+    .img-top-left {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      max-width: 180px;
+      max-height: 180px;
+      border-radius: 15px;
+      object-fit: cover;
+    }
+
+    .img-bottom-right {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      max-width: 180px;
+      max-height: 180px;
+      border-radius: 15px;
+      object-fit: cover;
+    }
+
+    /* Screen 2: Quiz */
+    .center-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+      z-index: 2;
+    }
+
+    .quiz-title {
+      font-size: 28px;
+      color: #ff7b9c;
+      margin-bottom: 25px;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .btn-option {
+      background: #ffffff;
+      border: 2px solid #ffccd5;
+      color: #5a4b4a;
+      font-size: 18px;
+      font-family: inherit;
+      font-weight: 600;
+      padding: 14px 20px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+
+    .btn-option:hover {
+      background: #fff0f3;
+      border-color: #ff7b9c;
+      color: #ff7b9c;
+      transform: translateY(-2px);
+    }
+
+    /* Screen 3: Sweet */
+    .s3-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    .s3-text-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .s3-text {
+      font-size: 30px;
+      color: #ff7b9c;
+      line-height: 1.3;
+      margin-bottom: 20px;
+    }
+
+    .s3-img {
+      flex: 1;
+      max-width: 320px;
+      border-radius: 20px;
+      object-fit: cover;
+    }
+
+    /* Screen 4 & 5 Text */
+    .center-text {
+      font-size: 28px;
+      color: #ff7b9c;
+      max-width: 550px;
+      text-align: center;
+      line-height: 1.4;
+      z-index: 2;
+    }
+
+    /* Screen 6: Final Image */
+    .final-img {
+      max-width: 85vw;
+      max-height: 85vh;
+      border-radius: 20px;
+      object-fit: contain;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    canvas#confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999;
+    }
+
     @media (max-width: 768px) {
-      .s1-container, .s3-content { flex-direction: column; text-align: center; }
-      .s3-text-box { align-items: center; }
-      .img-top-right, .img-bottom-left, .img-top-left, .img-bottom-right { max-width: 100px; max-height: 100px; }
+      .s1-container, .s3-content {
+        flex-direction: column;
+        text-align: center;
+      }
+      .s3-text-box {
+        align-items: center;
+      }
+      .img-top-right, .img-bottom-left, .img-top-left, .img-bottom-right {
+        max-width: 100px;
+        max-height: 100px;
+      }
     }
   </style>
 </head>
 <body>
 
   <canvas id="confetti-canvas"></canvas>
-  <audio id="bg-music" loop preload="auto"><source src="music1.mp3" type="audio/mpeg"></audio>
+
+  <!-- Audio Element -->
+  <audio id="bg-music" loop preload="auto">
+    <source src="music1.mp3" type="audio/mpeg">
+  </audio>
 
   <!-- SCREEN 1 -->
   <div id="screen1" class="screen active">
@@ -64,7 +353,10 @@
       <div class="s1-left">
         <h1 class="s1-title">Hey, pookie! I’ve prepared mini-game for you. To start enter the password</h1>
         <div class="pin-indicators" id="pin-dots">
-          <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
         </div>
         <div class="pin-keypad">
           <button class="btn-key" onclick="pressKey('1')">1</button>
@@ -91,6 +383,7 @@
   <div id="screen2" class="screen">
     <img src="pic2.jpg" class="img-top-right" onerror="this.src='https://via.placeholder.com/150?text=pic2.jpg'">
     <img src="pic3.jpg" class="img-bottom-left" onerror="this.src='https://via.placeholder.com/150?text=pic3.jpg'">
+    
     <div class="center-card">
       <h2 class="quiz-title">Who is the best nerd boy in the world?</h2>
       <div class="quiz-options">
@@ -117,6 +410,7 @@
   <div id="screen4" class="screen">
     <img src="pic5.jpg" class="img-top-left" onerror="this.src='https://via.placeholder.com/150?text=pic5.jpg'">
     <img src="pic6.jpg" class="img-bottom-right" onerror="this.src='https://via.placeholder.com/150?text=pic6.jpg'">
+    
     <div class="center-card">
       <h2 class="center-text">I didn’t make anything up but these pandas look a lot like you</h2>
       <button class="btn-next" onclick="goToScreen(5)">Next</button>
@@ -127,6 +421,7 @@
   <div id="screen5" class="screen">
     <img src="pic7.jpg" class="img-top-right" onerror="this.src='https://via.placeholder.com/150?text=pic7.jpg'">
     <img src="pic8.jpg" class="img-bottom-left" onerror="this.src='https://via.placeholder.com/150?text=pic8.jpg'">
+    
     <div class="center-card">
       <h2 class="center-text">Please don’t judge me too harshly, I put effort while writing this. Happy reading!</h2>
       <button class="btn-next" onclick="goToScreen(6)">Next</button>
@@ -146,24 +441,37 @@
 
     function startMusic() {
       if (!musicStarted) {
-        audio.play().then(() => { musicStarted = true; }).catch(e => console.log("Audio waiting"));
+        audio.play().then(() => {
+          musicStarted = true;
+        }).catch(e => {
+          console.log("Audio waiting for user click");
+        });
       }
     }
 
-    document.addEventListener('click', () => { startMusic(); }, { once: false });
-
+    document.addEventListener('click', function() {
+      startMusic();
+    }, { once: false });
     function goToScreen(screenNum) {
       startMusic();
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const screens = document.querySelectorAll('.screen');
+      screens.forEach(s => s.classList.remove('active'));
+      
       const targetScreen = document.getElementById(screen${screenNum});
-      if (targetScreen) { targetScreen.classList.add('active'); }
+      if (targetScreen) {
+        targetScreen.classList.add('active');
+      }
     }
 
     function updatePinDots() {
-      const dots = document.getElementById('pin-dots').children;
+      const dotsContainer = document.getElementById('pin-dots');
+      const dots = dotsContainer.children;
       for (let i = 0; i < 4; i++) {
-        if (i < currentPin.length) { dots[i].classList.add('filled'); }
-        else { dots[i].classList.remove('filled'); }
+        if (i < currentPin.length) {
+          dots[i].classList.add('filled');
+        } else {
+          dots[i].classList.remove('filled');
+        }
       }
     }
 
@@ -172,59 +480,98 @@
       if (currentPin.length < 4) {
         currentPin += num;
         updatePinDots();
-        if (currentPin.length === 4) { checkPin(); }
+        
+        if (currentPin.length === 4) {
+          checkPin();
+        }
       }
     }
 
-    function clearPin() { currentPin = ""; updatePinDots(); }
-    function backspacePin() { currentPin = currentPin.slice(0, -1); updatePinDots(); }
+    function clearPin() {
+      currentPin = "";
+      updatePinDots();
+    }
+
+    function backspacePin() {
+      currentPin = currentPin.slice(0, -1);
+      updatePinDots();
+    }
 
     function checkPin() {
       const dotsContainer = document.getElementById('pin-dots');
       if (currentPin === correctPin) {
-        setTimeout(() => { goToScreen(2); }, 300);
+        setTimeout(() => {
+          goToScreen(2);
+        }, 300);
       } else {
         dotsContainer.classList.add('shake', 'error-dots');
-        setTimeout(() => { dotsContainer.classList.remove('shake', 'error-dots'); clearPin(); }, 500);
+        setTimeout(() => {
+          dotsContainer.classList.remove('shake', 'error-dots');
+          clearPin();
+        }, 500);
       }
     }
 
     function handleQuizAnswer() {
       startMusic();
       launchConfetti();
-      setTimeout(() => { goToScreen(3); }, 1800);
+      setTimeout(() => {
+        goToScreen(3);
+      }, 1800);
     }
+
     function launchConfetti() {
       const canvas = document.getElementById('confetti-canvas');
       const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+
       const particles = [];
       const colors = ['#ff7b9c', '#ffb3c6', '#ffccd5', '#ff4d4d', '#ffd166', '#06d6a0'];
+
       for (let i = 0; i < 80; i++) {
         particles.push({
-          x: canvas.width / 2, y: canvas.height / 2,
-          vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 0.7) * 12,
-          size: Math.random() * 8 + 4, color: colors[Math.floor(Math.random() * colors.length)],
-          gravity: 0.25, alpha: 1
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 12,
+          vy: (Math.random() - 0.7) * 12,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          gravity: 0.25,
+          alpha: 1
         });
       }
+
       function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         let alive = false;
+
         particles.forEach(p => {
-          p.x += p.vx; p.y += p.vy; p.vy += p.gravity; p.alpha -= 0.012;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += p.gravity;
+          p.alpha -= 0.012;
+
           if (p.alpha > 0) {
             alive = true;
-            ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = p.alpha;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
           }
         });
-        if (alive) { requestAnimationFrame(animate); }
-        else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+        if (alive) {
+          requestAnimationFrame(animate);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
       }
+
       animate();
     }
   </script>
 </body>
 </html>
+    }
