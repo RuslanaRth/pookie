@@ -7,13 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -178,7 +178,7 @@
     .btn-next:active {
       transform: translateY(1px);
     }
-/* Absolute Corner Images */
+    /* Absolute Corner Images */
     .img-top-right {
       position: absolute;
       top: 30px;
@@ -314,7 +314,16 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     }
 
-    /* Responsive adjustments */
+    canvas#confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999;
+    }
+
     @media (max-width: 768px) {
       .s1-container, .s3-content {
         flex-direction: column;
@@ -332,8 +341,12 @@
 </head>
 <body>
 
+  <canvas id="confetti-canvas"></canvas>
+
   <!-- Audio Element -->
-  <audio id="bg-music" loop src="music1.mp3"></audio>
+  <audio id="bg-music" loop preload="auto">
+    <source src="music1.mp3" type="audio/mpeg">
+  </audio>
 
   <!-- SCREEN 1 -->
   <div id="screen1" class="screen active">
@@ -350,7 +363,7 @@
           <button class="btn-key" onclick="pressKey('1')">1</button>
           <button class="btn-key" onclick="pressKey('2')">2</button>
           <button class="btn-key" onclick="pressKey('3')">3</button>
-<button class="btn-key" onclick="pressKey('4')">4</button>
+          <button class="btn-key" onclick="pressKey('4')">4</button>
           <button class="btn-key" onclick="pressKey('5')">5</button>
           <button class="btn-key" onclick="pressKey('6')">6</button>
           <button class="btn-key" onclick="pressKey('7')">7</button>
@@ -429,11 +442,17 @@
 
     function startMusic() {
       if (!musicStarted) {
-        audio.play().catch(e => console.log("Audio play blocked until interaction"));
-        musicStarted = true;
+        audio.play().then(() => {
+          musicStarted = true;
+        }).catch(e => {
+          console.log("Audio waiting for user click");
+        });
       }
     }
 
+    document.addEventListener('click', function() {
+      startMusic();
+    }, { once: false });
     function goToScreen(screenNum) {
       startMusic();
       const screens = document.querySelectorAll('.screen');
@@ -444,7 +463,8 @@
         targetScreen.classList.add('active');
       }
     }
-function updatePinDots() {
+
+    function updatePinDots() {
       const dotsContainer = document.getElementById('pin-dots');
       const dots = dotsContainer.children;
       for (let i = 0; i < 4; i++) {
@@ -495,18 +515,63 @@ function updatePinDots() {
 
     function handleQuizAnswer() {
       startMusic();
-      // Trigger Confetti
-      if (typeof confetti === 'function') {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-      }
-
+      launchConfetti();
       setTimeout(() => {
         goToScreen(3);
       }, 1800);
+    }
+
+    /* Built-in Lightweight Confetti Engine */
+    function launchConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const colors = ['#ff7b9c', '#ffb3c6', '#ffccd5', '#ff4d4d', '#ffd166', '#06d6a0'];
+
+      for (let i = 0; i < 80; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 12,
+          vy: (Math.random() - 0.7) * 12,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          gravity: 0.25,
+          alpha: 1
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += p.gravity;
+          p.alpha -= 0.012;
+
+          if (p.alpha > 0) {
+            alive = true;
+            ctx.globalAlpha = p.alpha;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+
+        if (alive) {
+          requestAnimationFrame(animate);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+
+      animate();
     }
   </script>
 </body>
