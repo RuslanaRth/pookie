@@ -177,6 +177,7 @@
 
     .btn-next:active {
       transform: translateY(1px);
+    }
       /* Absolute Corner Images */
     .img-top-right {
       position: absolute;
@@ -457,7 +458,7 @@
       const screens = document.querySelectorAll('.screen');
       screens.forEach(s => s.classList.remove('active'));
       
-      const targetScreen = document.getElementById('screen${screenNum}');
+      const targetScreen = document.getElementById(`screen${screenNum}`);
       if (targetScreen) {
         targetScreen.classList.add('active');
       }
